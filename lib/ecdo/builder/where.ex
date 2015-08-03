@@ -5,7 +5,7 @@ defmodule Ecdo.Builder.Where do
   use Ecdo.Builder.Data
 
   require Record
-  Record.defrecordp :params, [values: [], count: 0, last: nil]
+  Record.defrecordp :params, [dot: false, values: [], count: 0, last: nil]
 
   def apply(ecdo, %{where: where}), do: put_in_query(ecdo, &(%{&1 | wheres: build(where, ecdo)}))
   def apply(ecdo, _), do: ecdo
@@ -32,7 +32,7 @@ defmodule Ecdo.Builder.Where do
   end
 
   defp build_ast([ast], ecdo) do
-    {expr, params(values: values)} = Macro.postwalk(ast, params(), &to_ecto_ast(&1, &2, ecdo))
+    {expr, params(values: values)} = Macro.prewalk(ast, params(), &to_ecto_ast(&1, &2, ecdo))
     [%QueryExpr{expr: expr, params: Enum.reverse(values)}]
   end
 
@@ -40,6 +40,13 @@ defmodule Ecdo.Builder.Where do
   defp to_ecto_ast({{:., _, _} = field, _, _}, params, ecdo) do
     # We ignore the outer AST, because field_ast add wrapper back
     {field, _type, _index} = field_spec = field_ecto(field, ecdo)
+    # Next element in form of {atom, _, nil} is a first part of atom.value call, and should be ignored
+    {field_ast(field_spec), params(params, last: field, dot: true)}
+  end
+  defp to_ecto_ast({_, _, nil} = other, params(dot: true) = params, ecdo), do: {other, params(params, dot: false)}
+  # If it is not a part of atom.value (dot: false), than it should be transformed to field
+  defp to_ecto_ast({field_name, _, nil} = other, params(dot: false), ecdo) do
+    {field, _type, _index} = field_spec = field_name |> to_string() |> field_ecto(ecdo)
     {field_ast(field_spec), params(params, last: field)}
   end
   defp to_ecto_ast(string, params(last: field, count: count, values: values) = params, ecdo) when is_binary(string) do

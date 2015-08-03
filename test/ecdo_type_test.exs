@@ -24,6 +24,7 @@ defmodule Ecdo.Integration.TypeTest do
     # ID
     assert [1] = Repo.all query([{"p", Post}], %{where: [{:==, "p.counter", integer}], select: "p.counter", select_as: :one})
     assert [1] = Repo.all query([{"p", Post}], %{where: "p.counter == 1", select: "p.counter", select_as: :one})
+    assert [1] = Repo.all query([{"p", Post}], %{where: "counter == 1", select: "p.counter", select_as: :one})
 
     # Integers
     assert [1] = Repo.all query([{"p", Post}], %{where: [{:==, "p.visits", integer}], select: "p.visits", select_as: :one})

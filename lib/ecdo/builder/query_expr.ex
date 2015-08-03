@@ -3,7 +3,7 @@ defmodule Ecdo.Builder.QueryExpr do
   Add to query limit, offset and disticts
   """
   use Ecdo.Builder.Data
-  @supported_expr [limit: :integer, distincts: :string, offset: :integer]
+  @supported_expr [limit: :integer, distinct: :string, offset: :integer]
 
   @doc false
   def apply(ecdo, content) do
