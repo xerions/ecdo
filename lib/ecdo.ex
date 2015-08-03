@@ -1,0 +1,31 @@
+defmodule Ecdo do
+  @moduledoc """
+  Provides the Query function.
+
+  Queries are used to retrieve and manipulate data in a repository (see
+  Ecto.Repo). Although this module provides a complete API, supporting
+  expressions like `where`, `select` and so forth.
+  """
+  @derive [Access]
+  defstruct [sources: %{}, modules: %{}, count: 0, param: nil, query: %Ecto.Query{}]
+
+  def query(sources \\ [], query) do
+    IO.inspect(query)
+    Map.keys(query) |> Enum.reduce(%{}, &check_string(&1, query, &2))
+    %Ecdo{} |> Ecdo.Builder.From.apply(sources)
+            |> Ecdo.Builder.Where.apply(query)
+            |> Ecdo.Builder.Select.apply(query)
+            |> IO.inspect
+  end
+
+  @keys [:where, :select, :select_as, :limit, :offset, :distincts,
+         :order_by, :preload, :left_join, :right_join, :full_join, :join]
+  for key <- @keys do
+    defp check_string(unquote(key), %{unquote(to_string(key)) => value}, acc), do: Map.put(acc, unquote(key), value)
+  end
+  defp check_string(_key, _, acc), do: acc
+end
+
+defimpl Ecto.Queryable, for: Ecdo do
+  def to_query(ecdo), do: ecdo.query
+end
