@@ -12,6 +12,7 @@ defmodule Ecdo do
   def query(sources \\ [], query) do
     Map.keys(query) |> Enum.reduce(%{}, &check_string(&1, query, &2))
     %Ecdo{} |> Ecdo.Builder.From.apply(sources)
+            |> Ecdo.Builder.Join.apply(query)
             |> Ecdo.Builder.Where.apply(query)
             |> Ecdo.Builder.Select.apply(query)
   end
