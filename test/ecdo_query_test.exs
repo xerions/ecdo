@@ -32,4 +32,20 @@ defmodule Ecdo.Integration.QueryTest do
     query = query([{"p", Post}], %{join: ["permalink", "comments"], select: "p.title,permalink.url,comments.text", select_as: :list} )
     assert [["2", "1", "a"]] = TestRepo.all(query)
   end
+
+  test "funs" do
+    for i <- 1..3, do: TestRepo.insert!(%Post{title: "test", visits: i})
+
+    query = query([{"p", Post}], %{where: "title == \"test\"", count: "id", select_as: :one} )
+    assert TestRepo.one(from(p in Post, where: p.title == "test", select: count(p.id))) == TestRepo.one(query)
+
+    query = query([{"p", Post}], %{where: "title == \"test\"", max: "visits", select_as: :one} )
+    TestRepo.one(from(p in Post, where: p.title == "test", select: max(p.visits))) == TestRepo.one(query)
+
+    query = query([{"p", Post}], %{where: "title == \"test\"", min: "visits", select_as: :one} )
+    TestRepo.one(from(p in Post, where: p.title == "test", select: min(p.visits))) == TestRepo.one(query)
+
+    query = query([{"p", Post}], %{where: "title == \"test\"", avg: "visits", select_as: :one} )
+    TestRepo.one(from(p in Post, where: p.title == "test", select: avg(p.visits))) == TestRepo.one(query)
+  end
 end
