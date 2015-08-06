@@ -22,9 +22,12 @@ defmodule Ecdo.Builder.Select do
     end
   end
 
-  defp transform({fun, arg}, _ecdo, _select_as), do: {fun, nil, [arg]}
-  defp transform(value, ecdo, select_as) do
-    field_ast = field_ecto(value, ecdo) |> field_ast()
+  defp transform({fun, arg}, ecdo, select_as),
+    do: {fun, nil, [field_ecto(arg, ecdo) |> field_ast()]} |> maybe_map(fun, select_as)
+  defp transform(value, ecdo, select_as),
+    do: field_ecto(value, ecdo) |> field_ast() |> maybe_map(value, select_as)
+
+  defp maybe_map(field_ast, value, select_as) do
     case select_as do
       is when is in [:map, :keyword] -> {value, field_ast}
       is when is in [:list, :one] -> field_ast
