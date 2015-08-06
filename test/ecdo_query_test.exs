@@ -34,18 +34,43 @@ defmodule Ecdo.Integration.QueryTest do
   end
 
   test "funs" do
-    for i <- 1..3, do: TestRepo.insert!(%Post{title: "test", visits: i})
+    for i <- 1..3 do 
+      p = TestRepo.insert!(%Post{title: "test", visits: i})
+      TestRepo.insert!(%Permalink{url: "test_url", post_id: p.id})
+    end
 
     query = query([{"p", Post}], %{where: "title == \"test\"", count: "id", select_as: :one} )
     assert TestRepo.one(from(p in Post, where: p.title == "test", select: count(p.id))) == TestRepo.one(query)
 
+    # with join
+    query = query([{"p", Post}], %{join: ["permalink"], where: "title == \"test\"", count: "permalink.url", select_as: :one} )
+    assert TestRepo.one(from(p in Post, join: permalink in assoc(p, :permalink), 
+                                        where: p.title == "test", 
+                                        select: count(permalink.url))) == TestRepo.one(query)
+
     query = query([{"p", Post}], %{where: "title == \"test\"", max: "visits", select_as: :one} )
-    TestRepo.one(from(p in Post, where: p.title == "test", select: max(p.visits))) == TestRepo.one(query)
+    assert TestRepo.one(from(p in Post, where: p.title == "test", select: max(p.visits))) == TestRepo.one(query)
 
     query = query([{"p", Post}], %{where: "title == \"test\"", min: "visits", select_as: :one} )
-    TestRepo.one(from(p in Post, where: p.title == "test", select: min(p.visits))) == TestRepo.one(query)
+    assert TestRepo.one(from(p in Post, where: p.title == "test", select: min(p.visits))) == TestRepo.one(query)
 
     query = query([{"p", Post}], %{where: "title == \"test\"", avg: "visits", select_as: :one} )
-    TestRepo.one(from(p in Post, where: p.title == "test", select: avg(p.visits))) == TestRepo.one(query)
+    assert TestRepo.one(from(p in Post, where: p.title == "test", select: avg(p.visits))) == TestRepo.one(query)
+  end
+
+  test "limit, offset and distinct" do
+    for i <- 1..4, do: TestRepo.insert!(%Post{title: "test_expr", visits: i})
+
+    query = query([{"p", Post}], %{select: "id,title", limit: "2", where: "title == \"test_expr\"", select_as: :list})
+    assert TestRepo.all(from(p in Post, select: [p.id, p.title], limit: 2, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query([{"p", Post}], %{select: "id,title", limit: "2", offset: 2, where: "title == \"test_expr\"", select_as: :list})
+    assert TestRepo.all(from(p in Post, select: [p.id, p.title], limit: 2, offset: 2, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query([{"p", Post}], %{select: "id,title", limit: 2, offset: 4, where: "title == \"test_expr\"", select_as: :list})
+    assert TestRepo.all(from(p in Post, select: [p.id, p.title], limit: 2, offset: 4, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query([{"p", Post}], %{select: "id", distinct: true, where: "title == \"test_expr\"", select_as: :one})
+    assert TestRepo.all(from(p in Post, select: p.id, distinct: true, where: p.title == "test_expr")) == TestRepo.all(query)
   end
 end

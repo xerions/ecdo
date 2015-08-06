@@ -15,6 +15,7 @@ defmodule Ecdo do
             |> Ecdo.Builder.Join.apply(query)
             |> Ecdo.Builder.Where.apply(query)
             |> Ecdo.Builder.Select.apply(query)
+            |> Ecdo.Builder.QueryExpr.apply(query)
   end
 
   @keys [:where, :select, :select_as, :limit, :offset, :distincts,
