@@ -18,19 +18,29 @@ defmodule Ecdo.Integration.QueryTest do
     c1 = TestRepo.insert!(%Permalink{url: "1", post_id: p2.id})
     c2 = TestRepo.insert!(%Comment{text: "a", post_id: p2.id})
 
-    query = query([{"p", Post}], %{join: ["permalink"], order_by: "p.id", select: "p.title,permalink.url", select_as: :list} )
-    assert [["2", "1"]] = TestRepo.all(query)
+    query = query([{"p", Post}], %{join: ["permalink"], order_by: "id", select: "p.title,permalink.url", select_as: :list} )
+    assert [["2", "1"]] == TestRepo.all(query)
 
     # try to join unavailable talble
     query = query([{"p", Post}], %{join: ["permalink", "abc123"], order_by: "p.id", select: "p.title,permalink.url", select_as: :list} )
-    assert [["2", "1"]] = TestRepo.all(query)
+    assert [["2", "1"]] == TestRepo.all(query)
 
     query = query([{"p", Post}], %{left_join: ["permalink"], order_by: "p.id", select: "p.title,permalink.url", select_as: :list} )
-    assert [["1", nil], ["2", "1"]] = TestRepo.all(query)
+    assert [["1", nil], ["2", "1"]] == TestRepo.all(query)
+
+    # sort by joined table
+    c3 = TestRepo.insert!(%Permalink{url: "2", post_id: p2.id})
+    query = query([{"p", Post}], %{left_join: ["permalink"], order_by: "permalink.url", select: "p.title,permalink.url", select_as: :list} )
+    assert [["1", nil], ["2", "1"], ["2", "2"]] == TestRepo.all(query)
 
     # multiple join
     query = query([{"p", Post}], %{join: ["permalink", "comments"], select: "p.title,permalink.url,comments.text", select_as: :list} )
-    assert [["2", "1", "a"]] = TestRepo.all(query)
+    assert [["2", "1", "a"], ["2", "2", "a"]] == TestRepo.all(query)
+
+    # multiple orderby
+    query = query([{"p", Post}], %{join: ["permalink"], order_by: "id,permalink.url:desc", select: "p.title,permalink.url", select_as: :list} )
+    assert [["2", "2"], ["2", "1"]] == TestRepo.all(query)
+
   end
 
   test "funs" do

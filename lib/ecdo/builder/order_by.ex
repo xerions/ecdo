@@ -1,19 +1,28 @@
 defmodule Ecdo.Builder.OrderBy do
-  def build(query, %{"order_by" => order_by_content}, join_models) do
+  @moduledoc """
+  Used to build 'order_by'
+  """
+
+  use Ecdo.Builder.Data
+  import Ecto.Query
+
+  def apply(ecdo, %{order_by: order_by}) do
+    String.split(order_by, ",") |> Enum.reduce(ecdo, &build(&2, &1))
+  end
+  def apply(ecdo, _query), do: ecdo
+
+  def build(ecdo, order_by_content) do
     [field | next] = String.split(order_by_content, ":")
     direction = case next do
       [] -> :asc
       [direction] -> direction |> String.to_atom
     end
-    {index, field} = Ecdo.Util.field(field, join_models)
-    query_expr = %Ecto.Query.QueryExpr{expr: [quoted_expr(direction, index, field)], params: []}
-    %{query | order_bys: [query_expr]}
+    field_ast = field_ecto(field, ecdo) |> field_ast()
+    query_expr = %Ecto.Query.QueryExpr{expr: [{direction, field_ast}], params: []}
+    %{ecdo | query: Map.put(ecdo.query, :order_bys, get(ecdo.query, :order_bys) ++[query_expr])}
   end
-
-  def build(query, _query_content, _), do: query
 
   def quoted_expr(direction, index, field) do
     {direction, {{:., [], [{:&, [], [index]}, field]}, [], []}}
   end
-
 end
