@@ -33,5 +33,8 @@ defmodule EcdoTest do
     assert from(w in Weather) == query([{"w", Weather}], %{}).query
     # basic list interface
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query([{"w", Weather}], %{where: [{:==, "w.temp_lo", 20}]}).query)
+    assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query([{"w", Weather}], %{"where" => "w.temp_lo == 20"}).query)
+    assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query([{"w", Weather}], %{"where" => "w.temp_lo == 20", unknow_key: 1}).query)
+    assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query([{"w", Weather}], %{"where" => "w.temp_lo == 20", "unknow_key" => 1}).query)
   end
 end
