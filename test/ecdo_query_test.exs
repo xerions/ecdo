@@ -83,4 +83,21 @@ defmodule Ecdo.Integration.QueryTest do
     query = query([{"p", Post}], %{select: "id", distinct: true, where: "title == \"test_expr\"", select_as: :one})
     assert TestRepo.all(from(p in Post, select: p.id, distinct: true, where: p.title == "test_expr")) == TestRepo.all(query)
   end
+
+  test "load" do
+    p = TestRepo.insert!(%Post{title: "test_load"})
+    TestRepo.insert!(%Permalink{url: "test_load_url", post_id: p.id})
+    TestRepo.insert!(%Comment{text: "test_load_commnet", post_id: p.id})
+
+    query = query([{"p", Post}], %{where: "title == \"test_load\"", load: ["permalink"]})
+    post = TestRepo.one(query)
+    assert post.title == "test_load"
+    assert post.permalink.url == "test_load_url"
+
+    query = query([{"p", Post}], %{where: "title == \"test_load\"", load: ["permalink", :comments]})
+    post = TestRepo.one(query)
+    assert post.title == "test_load"
+    assert post.permalink.url == "test_load_url"
+    assert hd(post.comments).text == "test_load_commnet"
+  end
 end

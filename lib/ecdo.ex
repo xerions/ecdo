@@ -17,6 +17,7 @@ defmodule Ecdo do
             |> Ecdo.Builder.Select.apply(query)
             |> Ecdo.Builder.OrderBy.apply(query)
             |> Ecdo.Builder.QueryExpr.apply(query)
+            |> Ecdo.Builder.Load.apply(query)
   end
 
   @keys [:where, :select, :select_as, :count, :avg, :sum, :min, :max, :limit, :offset, :distinct,
