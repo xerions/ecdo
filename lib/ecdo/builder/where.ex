@@ -45,7 +45,7 @@ defmodule Ecdo.Builder.Where do
   end
   defp to_ecto_ast({_, _, nil} = other, params(dot: true) = params, ecdo), do: {other, params(params, dot: false)}
   # If it is not a part of atom.value (dot: false), than it should be transformed to field
-  defp to_ecto_ast({field_name, _, nil} = other, params(dot: false), ecdo) do
+  defp to_ecto_ast({field_name, _, nil} = other, params(dot: false) = params, ecdo) do
     {field, _type, _index} = field_spec = field_name |> to_string() |> field_ecto(ecdo)
     {field_ast(field_spec), params(params, last: field)}
   end
