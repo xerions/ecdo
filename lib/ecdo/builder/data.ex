@@ -40,4 +40,6 @@ defmodule Ecdo.Builder.Data do
   def map_ast(list) do
     quote do: %{unquote_splicing(list)}
   end
+
+  def get(map, key), do: Map.get(map, key) || []
 end

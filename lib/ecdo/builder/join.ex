@@ -4,6 +4,7 @@ defmodule Ecdo.Builder.Join do
   """
   import Kernel, except: [apply: 2]
   import Ecto.Query
+  use Ecdo.Builder.Data
 
   @join_direction  [:left_join, :right_join, :full_join, :join]
   @mapping  [left_join: :left, right_join: :right, full_join: :full_join, join: :inner]
@@ -33,7 +34,4 @@ defmodule Ecdo.Builder.Join do
   end
 
   defp assoc(root, table), do: root.__schema__(:association, table).assoc
-
-  defp get(map, key), do: Map.get(map, key) || []
-
 end
