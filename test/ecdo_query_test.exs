@@ -12,6 +12,12 @@ defmodule Ecdo.Integration.QueryTest do
   alias Ecto.Integration.TestRepo
   alias Ecto.Integration.PoolRepo
 
+  test "query without select" do
+    p1 = TestRepo.insert!(%Post{title: "1"})
+    query = query({"p", Post}, %{where: "p.title == 1"} )
+    assert [p1] = TestRepo.all(query)
+  end
+
   test "joins" do
     p1 = TestRepo.insert!(%Post{title: "1"})
     p2 = TestRepo.insert!(%Post{title: "2"})
