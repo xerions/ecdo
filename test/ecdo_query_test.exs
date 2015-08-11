@@ -51,7 +51,7 @@ defmodule Ecdo.Integration.QueryTest do
   end
 
   test "funs" do
-    for i <- 1..3 do 
+    for i <- 1..3 do
       p = TestRepo.insert!(%Post{title: "test", visits: i})
       TestRepo.insert!(%Permalink{url: "test_url", post_id: p.id})
     end
@@ -61,8 +61,8 @@ defmodule Ecdo.Integration.QueryTest do
 
     # with join
     query = query({"p", Post}, %{join: ["permalink"], where: "title == \"test\"", count: "permalink.url", select_as: :one} )
-    assert TestRepo.one(from(p in Post, join: permalink in assoc(p, :permalink), 
-                                        where: p.title == "test", 
+    assert TestRepo.one(from(p in Post, join: permalink in assoc(p, :permalink),
+                                        where: p.title == "test",
                                         select: count(permalink.url))) == TestRepo.one(query)
 
     query = query({"p", Post}, %{where: "title == \"test\"", max: "visits", select_as: :one} )
@@ -108,5 +108,16 @@ defmodule Ecdo.Integration.QueryTest do
     assert hd(post.comments).text == "test_load_commnet"
     query = query({"p", Post}, %{where: "title == \"test_load\"", load: "permalink, comments"})
     assert post == TestRepo.one(query)
+  end
+
+  test "like" do
+    TestRepo.insert!(%Post{title: "abcd"})
+    TestRepo.insert!(%Post{title: "adee"})
+
+    query = query({"p", Post}, %{select: "title", where: "like(title, \"%bc%\")", select_as: :one} )
+    assert "abcd" == TestRepo.one(query)
+
+    query = query({"p", Post}, %{select: "title", where: "like(title, \"%bc%\") or like(title, \"%de%\")", select_as: :list} )
+    assert [["abcd"], ["adee"]] == TestRepo.all(query)
   end
 end
