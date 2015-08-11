@@ -32,5 +32,41 @@ defmodule Weather.Api do
   end
 end
 
+# Example of use:
+
 Weather.Api.json ~S({"where": "weather.temp_lo > 25", "limit": 10})
+```
+
+## Usage
+
+You need to add both Ecto and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
+
+Database                | Ecto Adapter           | Dependency
+:---------------------- | :--------------------- | :-------------------
+PostgreSQL              | Ecto.Adapters.Postgres | [postgrex][postgrex]
+MySQL                   | Ecto.Adapters.MySQL    | [mariaex][mariaex]
+MSSQL                   | Tds.Ecto               | [tds_ecto][tds_ecto]
+SQLite3                 | Sqlite.Ecto            | [sqlite_ecto][sqlite_ecto]
+
+[postgrex]: http://github.com/ericmj/postgrex
+[mariaex]: http://github.com/xerions/mariaex
+[tds_ecto]: https://github.com/livehelpnow/tds_ecto
+[sqlite_ecto]: https://github.com/jazzyb/sqlite_ecto
+
+For example, if you want to use MySQL, add to your `mix.exs` file:
+
+```elixir
+defp deps do
+  [{:mariaex, ">= 0.0.0"},
+   #{:ecdo, "~> 0.1.0"},
+   {:ecdo, github: "xerions/ecdo"}]
+end
+```
+
+and update your applications list to include both projects:
+
+```elixir
+def application do
+  [applications: [:mariaex, :ecdo]]
+end
 ```
