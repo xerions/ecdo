@@ -10,7 +10,7 @@ defmodule Ecdo.Builder.Data do
   end
 
   def put_in_query(%{query: query} = ecdo, fun) when is_function(fun), do: %{ecdo | query: fun.(query)}
-  def put_in_query(%{query: query} = ecdo, value), do: %{ecdo | query: value}
+  def put_in_query(%{query: _query} = ecdo, value), do: %{ecdo | query: value}
 
   def field_ecto(strings, %{sources: sources, modules: modules}) when is_list(strings) do
     {index, field} = case strings do

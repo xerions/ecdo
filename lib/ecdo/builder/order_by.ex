@@ -4,7 +4,6 @@ defmodule Ecdo.Builder.OrderBy do
   """
 
   use Ecdo.Builder.Data
-  import Ecto.Query
 
   def apply(ecdo, %{order_by: order_by}) do
     order_by |> tokens |> Enum.reduce(ecdo, &build(&2, &1))
