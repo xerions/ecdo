@@ -37,6 +37,8 @@ end
 Weather.Api.json ~S({"where": "weather.temp_lo > 25", "limit": 10})
 ```
 
+Due to some direct manipulations with ecto intern AST, ecdo aims to have always close to 100% of test cover.
+
 ## Usage
 
 You need to add both Ecto and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
@@ -58,8 +60,7 @@ For example, if you want to use MySQL, add to your `mix.exs` file:
 ```elixir
 defp deps do
   [{:mariaex, ">= 0.0.0"},
-   #{:ecdo, "~> 0.1.0"},
-   {:ecdo, github: "xerions/ecdo"}]
+   {:ecdo, "~> 0.1.0"}]
 end
 ```
 
