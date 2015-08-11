@@ -23,9 +23,9 @@ defmodule Ecdo do
   @keys [:where, :select, :select_as, :count, :avg, :sum, :min, :max, :limit, :offset, :distinct,
          :order_by, :load, :preload, :left_join, :right_join, :full_join, :join]
   for key <- @keys do
-    defp check_string(unquote(key), %{unquote(key) => value}, acc), 
+    defp check_string(unquote(key), %{unquote(key) => value}, acc),
       do: Map.put(acc, unquote(key), value)
-    defp check_string(unquote(to_string(key)), %{unquote(to_string(key)) => value}, acc), 
+    defp check_string(unquote(to_string(key)), %{unquote(to_string(key)) => value}, acc),
       do: Map.put(acc, unquote(key), value)
   end
   defp check_string(_key, _, acc), do: acc

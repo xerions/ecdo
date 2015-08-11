@@ -27,10 +27,12 @@ defmodule Ecdo.Builder.Data do
   def field_ecto({:., _, [model, value]}, ecdo),
     do: [Macro.to_string(model), to_string(value)] |> field_ecto(ecdo)
 
-  def field_ast({field, type, index}) do
+  def field_ast({field, type, index}, with_type? \\ true) do
     ast = (quote do: (&unquote(index)).unquote(field))
     type = if Ecto.Type.primitive?(type) do type else type.type end
-    put_elem(ast, 1, [ecto_type: type])
+    if with_type?,
+      do: put_elem(ast, 1, [ecto_type: type]),
+      else: ast
   end
 
   def param_ast(count) do

@@ -5,7 +5,7 @@ defmodule Ecdo.Builder.Where do
   use Ecdo.Builder.Data
 
   require Record
-  Record.defrecordp :params, [dot: false, values: [], count: 0, last: nil]
+  Record.defrecordp :params, [dot: false, values: [], count: 0, last: nil, operator: :default]
 
   def apply(ecdo, %{where: where}), do: put_in_query(ecdo, &(%{&1 | wheres: build(where, ecdo)}))
   def apply(ecdo, _), do: ecdo
@@ -18,8 +18,9 @@ defmodule Ecdo.Builder.Where do
     Enum.map(where, &build_conditions(&1, ecdo))
   end
 
-  @type_operators [:==, :>, :<, :!=, :>=, :<=,]
-  @allowed_operations [:not, :or, :and, :like, :ilike | @type_operators]
+  @like_functions [:like, :ilike]
+  @type_operators [:==, :>, :<, :!=, :>=, :<=]
+  @allowed_operations [:not, :or, :and | @type_operators]
 
   defp build_conditions({op, _, _} = opspec, ecdo) when op in @allowed_operations do
     %QueryExpr{expr: op_ast(opspec, ecdo)}
@@ -36,20 +37,24 @@ defmodule Ecdo.Builder.Where do
     [%QueryExpr{expr: expr, params: Enum.reverse(values)}]
   end
 
-  defp to_ecto_ast({op, _, _} = opast, acc, _ecdo) when op in @allowed_operations, do: {opast, acc}
-  defp to_ecto_ast({{:., _, _} = field, _, _}, params, ecdo) do
+  defp to_ecto_ast({op, _, _} = opast, params, _ecdo) when op in @allowed_operations,
+    do: {opast, params(params, operator: :default)}
+  defp to_ecto_ast({op, _, _} = opast, params, _ecdo) when op in @like_functions,
+    do: (IO.inspect(:like); {opast, params(params, operator: :function)})
+  defp to_ecto_ast({{:., _, _} = field, _, _}, params(operator: operator) = params, ecdo) do
     # We ignore the outer AST, because field_ast add wrapper back
     {field, _type, _index} = field_spec = field_ecto(field, ecdo)
     # Next element in form of {atom, _, nil} is a first part of atom.value call, and should be ignored
-    {field_ast(field_spec), params(params, last: field, dot: true)}
+    {field_ast(field_spec, operator == :default), params(params, last: field, dot: true)}
   end
   defp to_ecto_ast({_, _, nil} = other, params(dot: true) = params, _ecdo), do: {other, params(params, dot: false)}
   # If it is not a part of atom.value (dot: false), than it should be transformed to field
-  defp to_ecto_ast({field_name, _, nil}, params(dot: false) = params, ecdo) do
+  defp to_ecto_ast({field_name, _, nil}, params(dot: false, operator: operator) = params, ecdo) do
     {field, _type, _index} = field_spec = field_name |> to_string() |> field_ecto(ecdo)
-    {field_ast(field_spec), params(params, last: field)}
+    # We do not need to set type, if operator is like, we set operator to :function, if we see like
+    {field_ast(field_spec, operator == :default), params(params, last: field)}
   end
-  defp to_ecto_ast(string, params(last: field, count: count, values: values) = params, _ecdo) when is_binary(string) do
+  defp to_ecto_ast(string, params(operator: :default, last: field, count: count, values: values) = params, _ecdo) when is_binary(string) do
     # as string i our parameter, we should replace it with name of the field and count
     new_params = params(params, last: nil, count: count + 1, values: [{string, {count, field}} | values])
     {param_ast(count), new_params}
