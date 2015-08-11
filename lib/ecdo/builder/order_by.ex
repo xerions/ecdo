@@ -5,6 +5,7 @@ defmodule Ecdo.Builder.OrderBy do
 
   use Ecdo.Builder.Data
 
+  @doc false
   def apply(ecdo, %{order_by: order_by}) do
     order_by |> tokens |> Enum.reduce(ecdo, &build(&2, &1))
   end

@@ -18,7 +18,7 @@ defmodule Ecdo.Builder.QueryExpr do
     end
   end
 
-  # don't generate code for distinct with true and false because it works incorrectly 
+  # don't generate code for distinct with true and false because it works incorrectly
   defp eval(query, :distinct, true), do: from(x in query, distinct: true)
   defp eval(query, :distinct, false), do: from(x in query, distinct: false)
   for key <- @supported_expr do

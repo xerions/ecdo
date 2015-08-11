@@ -1,8 +1,12 @@
 defmodule Ecdo.Builder.Select do
+  @moduledoc """
+  Add to query select
+  """
   use Ecdo.Builder.Data
 
   @aggr_funs [:count, :avg, :sum, :min, :max]
 
+  @doc false
   def apply(ecdo, content) do
     case build_select(content, ecdo) do
       [] -> ecdo
@@ -11,11 +15,11 @@ defmodule Ecdo.Builder.Select do
   end
 
   defp build_select(content, ecdo) do
-    select = Map.get(content, :select) || "" 
+    select = Map.get(content, :select) || ""
     select_as = content[:select_as] || :map
-    ast = select 
+    ast = select
           |> tokens
-          |> add_funs(content) 
+          |> add_funs(content)
           |> Enum.map(&transform(&1, ecdo, select_as))
     case ast do
       [] -> []

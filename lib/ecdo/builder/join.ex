@@ -9,16 +9,17 @@ defmodule Ecdo.Builder.Join do
   @join_direction  [:left_join, :right_join, :full_join, :join]
   @mapping  [left_join: :left, right_join: :right, full_join: :full_join, join: :inner]
 
+  @doc false
   def apply(ecdo, query) do
-    Map.keys(query) 
-    |> Enum.filter(fn(k) -> k in @join_direction end) 
+    Map.keys(query)
+    |> Enum.filter(fn(k) -> k in @join_direction end)
     |> Enum.reduce(ecdo, &build(&1, &2, query))
   end
 
   defp build(direction, ecdo, params) do
     root = ecdo.modules[0]
     associations = root.__schema__(:associations) |> Enum.map(&Atom.to_string(&1))
-    Map.get(params, direction) 
+    Map.get(params, direction)
     |> tokens
     |> Stream.filter(&(&1 in associations))
     |> Enum.map(&String.to_atom/1)

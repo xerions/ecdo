@@ -7,6 +7,7 @@ defmodule Ecdo.Builder.Where do
   require Record
   Record.defrecordp :params, [dot: false, values: [], count: 0, last: nil, operator: :default]
 
+  @doc false
   def apply(ecdo, %{where: where}), do: put_in_query(ecdo, &(%{&1 | wheres: build(where, ecdo)}))
   def apply(ecdo, _), do: ecdo
 

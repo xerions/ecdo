@@ -5,6 +5,7 @@ defmodule Ecdo.Builder.Load do
   import Kernel, except: [apply: 2]
   use Ecdo.Builder.Data
 
+  @doc false
   def apply(ecdo, content) do
     root = ecdo.modules[0]
     put_in_query(ecdo, build(root, ecdo.query, content))
