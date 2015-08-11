@@ -41,7 +41,7 @@ defmodule Ecdo.Builder.Where do
   defp to_ecto_ast({op, _, _} = opast, params, _ecdo) when op in @allowed_operations,
     do: {opast, params(params, operator: :default)}
   defp to_ecto_ast({op, _, _} = opast, params, _ecdo) when op in @like_functions,
-    do: (IO.inspect(:like); {opast, params(params, operator: :function)})
+    do: {opast, params(params, operator: :function)}
   defp to_ecto_ast({{:., _, _} = field, _, _}, params(operator: operator) = params, ecdo) do
     # We ignore the outer AST, because field_ast add wrapper back
     {field, _type, _index} = field_spec = field_ecto(field, ecdo)
