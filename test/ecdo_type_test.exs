@@ -22,32 +22,32 @@ defmodule Ecdo.Integration.TypeTest do
                        counter: integer, inserted_at: datetime, intensity: float})
 
     # ID
-    assert [1] = Repo.all query([{"p", Post}], %{where: [{:==, "p.counter", integer}], select: "p.counter", select_as: :one})
-    assert [1] = Repo.all query([{"p", Post}], %{where: "p.counter == 1", select: "p.counter", select_as: :one})
-    assert [1] = Repo.all query([{"p", Post}], %{where: "counter == 1", select: "p.counter", select_as: :one})
+    assert [1] = Repo.all query({"p", Post}, %{where: [{:==, "p.counter", integer}], select: "p.counter", select_as: :one})
+    assert [1] = Repo.all query({"p", Post}, %{where: "p.counter == 1", select: "p.counter", select_as: :one})
+    assert [1] = Repo.all query({"p", Post}, %{where: "counter == 1", select: "p.counter", select_as: :one})
 
     # Integers
-    assert [1] = Repo.all query([{"p", Post}], %{where: [{:==, "p.visits", integer}], select: "p.visits", select_as: :one})
-    assert [1] = Repo.all query([{"p", Post}], %{where: "p.visits == 1", select: "p.visits", select_as: :one})
+    assert [1] = Repo.all query({"p", Post}, %{where: [{:==, "p.visits", integer}], select: "p.visits", select_as: :one})
+    assert [1] = Repo.all query({"p", Post}, %{where: "p.visits == 1", select: "p.visits", select_as: :one})
 
     # Floats
-    assert [0.1] = Repo.all query([{"p", Post}], %{where: [{:==, "p.intensity", float}], select: "p.intensity", select_as: :one})
-    assert [0.1] = Repo.all query([{"p", Post}], %{where: "p.intensity == 0.1", select: "p.intensity", select_as: :one})
+    assert [0.1] = Repo.all query({"p", Post}, %{where: [{:==, "p.intensity", float}], select: "p.intensity", select_as: :one})
+    assert [0.1] = Repo.all query({"p", Post}, %{where: "p.intensity == 0.1", select: "p.intensity", select_as: :one})
 
     # Booleans
-    assert [true] = Repo.all query([{"p", Post}], %{where: [{:==, "p.public", true}], select: "p.public", select_as: :one})
-    assert [true] = Repo.all query([{"p", Post}], %{where: "p.public == true", select: "p.public", select_as: :one})
+    assert [true] = Repo.all query({"p", Post}, %{where: [{:==, "p.public", true}], select: "p.public", select_as: :one})
+    assert [true] = Repo.all query({"p", Post}, %{where: "p.public == true", select: "p.public", select_as: :one})
 
     # Binaries
-    assert [^text] = Repo.all query([{"p", Post}], %{where: [{:==, "p.text", <<0,1>>}], select: "p.text", select_as: :one})
+    assert [^text] = Repo.all query({"p", Post}, %{where: [{:==, "p.text", <<0,1>>}], select: "p.text", select_as: :one})
     # Do not work
    # assert [^text] = Repo.all query([{"p", Post}], %{where: "p.text == <<0,1>>", select: "p.text", select_as: :one})
 
     # UUID
-    assert [^uuid] = Repo.all query([{"p", Post}], %{where: "p.uuid == \"#{uuid}\"", select: "p.uuid", select_as: :one})
+    assert [^uuid] = Repo.all query({"p", Post}, %{where: "p.uuid == \"#{uuid}\"", select: "p.uuid", select_as: :one})
 
     # Datetime
-    assert [^datetime] = Repo.all query([{"p", Post}], %{where: "p.inserted_at == \"#{Ecto.DateTime.to_iso8601(datetime)}\"", select: "p.inserted_at", select_as: :one})
+    assert [^datetime] = Repo.all query({"p", Post}, %{where: "p.inserted_at == \"#{Ecto.DateTime.to_iso8601(datetime)}\"", select: "p.inserted_at", select_as: :one})
   end
 
 #  test "binary id type" do
@@ -60,11 +60,11 @@ defmodule Ecdo.Integration.TypeTest do
   test "composite types in select" do
     assert %Post{} = Repo.insert!(%Post{title: "1", text: "hai"})
 
-    assert [["1", "hai"]] == Repo.all query([{"p", Post}], %{select: "p.title,p.text", select_as: :one})
+    assert [["1", "hai"]] == Repo.all query({"p", Post}, %{select: "p.title,p.text", select_as: :one})
 
-    assert [[{"p.title", "1"}, {"p.text", "hai"}]] == Repo.all query([{"p", Post}], %{select: "p.title,p.text", select_as: :keyword})
+    assert [[{"p.title", "1"}, {"p.text", "hai"}]] == Repo.all query({"p", Post}, %{select: "p.title,p.text", select_as: :keyword})
 
-    assert [%{"p.title" => "1", "p.text" => "hai"}] == Repo.all query([{"p", Post}], %{select: "p.title,p.text", select_as: :map})
+    assert [%{"p.title" => "1", "p.text" => "hai"}] == Repo.all query({"p", Post}, %{select: "p.title,p.text", select_as: :map})
 
     #assert [%Post{}] == Repo.all query([{"p", Post}], %{select: "p"})
     # TODO: define, if we need such complex case
@@ -81,10 +81,10 @@ defmodule Ecdo.Integration.TypeTest do
     post1 = Repo.insert!(%Post{meta: %{"foo" => "bar", "baz" => "bat"}})
     post2 = Repo.insert!(%Post{meta: %{foo: "bar", baz: "bat"}})
 
-    assert Repo.all(query([{"p", Post}], %{where: "p.id == #{post1.id}", select: "p.meta", select_as: :one})) ==
+    assert Repo.all(query({"p", Post}, %{where: "p.id == #{post1.id}", select: "p.meta", select_as: :one})) ==
            [%{"foo" => "bar", "baz" => "bat"}]
 
-    assert Repo.all(query([{"p", Post}], %{where: "p.id == #{post2.id}", select: "p.meta", select_as: :one})) ==
+    assert Repo.all(query({"p", Post}, %{where: "p.id == #{post2.id}", select: "p.meta", select_as: :one})) ==
            [%{"foo" => "bar", "baz" => "bat"}]
   end
 
@@ -94,10 +94,10 @@ defmodule Ecdo.Integration.TypeTest do
 
     Repo.insert!(%Post{cost: decimal})
 
-    assert [^decimal] = Repo.all query([{"p", Post}], %{where: "p.cost == 1.0", select: "p.cost", select_as: :one})
-    assert [^decimal] = Repo.all query([{"p", Post}], %{where: "p.cost == 1", select: "p.cost", select_as: :one})
-    assert [^decimal] = Repo.all query([{"p", Post}], %{where: [{:==, "p.cost", 1.0}], select: "p.cost", select_as: :one})
-    assert [^decimal] = Repo.all query([{"p", Post}], %{where: [{:==, "p.cost", 1}], select: "p.cost", select_as: :one})
+    assert [^decimal] = Repo.all query({"p", Post}, %{where: "p.cost == 1.0", select: "p.cost", select_as: :one})
+    assert [^decimal] = Repo.all query({"p", Post}, %{where: "p.cost == 1", select: "p.cost", select_as: :one})
+    assert [^decimal] = Repo.all query({"p", Post}, %{where: [{:==, "p.cost", 1.0}], select: "p.cost", select_as: :one})
+    assert [^decimal] = Repo.all query({"p", Post}, %{where: [{:==, "p.cost", 1}], select: "p.cost", select_as: :one})
 
   end
 end

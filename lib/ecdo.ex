@@ -9,9 +9,9 @@ defmodule Ecdo do
   @derive [Access]
   defstruct [sources: %{}, modules: %{}, count: 0, param: nil, query: %Ecto.Query{}]
 
-  def query(sources \\ [], query) do
+  def query(source, query) do
     query = Map.keys(query) |> Enum.reduce(%{}, &check_string(&1, query, &2))
-    %Ecdo{} |> Ecdo.Builder.From.apply(sources)
+    %Ecdo{} |> Ecdo.Builder.From.apply(source)
             |> Ecdo.Builder.Join.apply(query)
             |> Ecdo.Builder.Where.apply(query)
             |> Ecdo.Builder.Select.apply(query)
