@@ -95,6 +95,15 @@ defmodule Ecdo.Integration.QueryTest do
 
     query = query({"p", Post}, %{select: "id", distinct: true, where: "title == \"test_expr\"", select_as: :one})
     assert TestRepo.all(from(p in Post, select: p.id, distinct: true, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query({"p", Post}, %{select: "id", distinct: "true", where: "title == \"test_expr\"", select_as: :one})
+    assert TestRepo.all(from(p in Post, select: p.id, distinct: true, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query({"p", Post}, %{select: "id", distinct: "false", where: "title == \"test_expr\"", select_as: :one})
+    assert TestRepo.all(from(p in Post, select: p.id, distinct: false, where: p.title == "test_expr")) == TestRepo.all(query)
+
+    query = query({"p", Post}, %{select: "id", distinct: false, where: "title == \"test_expr\"", select_as: :one})
+    assert TestRepo.all(from(p in Post, select: p.id, distinct: false, where: p.title == "test_expr")) == TestRepo.all(query)
   end
 
   test "load" do
