@@ -10,8 +10,9 @@ defmodule Ecdo.Builder.From do
                  modules: Map.put(modules, count, model),
                  count: count + 1,
                  query: from(c in model)}
-  def apply(ecdo, sources) when is_list(sources),
-    do: Enum.reduce(sources, ecdo, &apply(&2, &1))
-  def apply(%Ecdo{} = ecdo, model),
-    do: %{ecdo | query: from(c in model)}
+  def apply(%Ecdo{sources: sources, modules: modules, count: count} = ecdo, model),
+    do: %{ecdo | sources: Map.put(sources, model.__schema__(:source), count),
+                 modules: Map.put(modules, count, model),
+                 count: count + 1,
+                 query: from(c in model)}
 end
