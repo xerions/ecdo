@@ -41,7 +41,7 @@ Due to some direct manipulations with ecto intern AST, ecdo aims to have always 
 
 ## Usage
 
-You need to add both Ecto and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
+You need to add both Ecdo and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
 
 Database                | Ecto Adapter           | Dependency
 :---------------------- | :--------------------- | :-------------------
