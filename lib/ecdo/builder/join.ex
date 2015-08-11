@@ -35,5 +35,5 @@ defmodule Ecdo.Builder.Join do
                          end)
   end
 
-  defp assoc(root, table), do: root.__schema__(:association, table).assoc
+  defp assoc(root, table), do: root.__schema__(:association, table).related
 end

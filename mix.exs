@@ -30,9 +30,9 @@ defmodule Ecdo.Mixfile do
     [{:mariaex, ">= 0.0.0"},
      {:postgrex, ">= 0.0.0"},
      {:poison, "~> 1.0"},
-     {:ecto, "~> 0.14.0"},
+     {:ecto, "~> 0.15.0"},
      {:ecto_it, "~> 0.2.0"},
-     {:ecto_migrate, "~> 0.5.0"},
+     {:ecto_migrate, "~> 0.6.0"},
      {:coverex, "~> 1.4.1", only: :test}]
   end
 end
