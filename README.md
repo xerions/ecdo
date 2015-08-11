@@ -5,8 +5,8 @@ Like an [ecto](https://github.com/elixir-lang/ecto), but dynamic. EcDo.
 Ecto is a domain specific language for writing queries and interacting with databases in Elixir.
 Ecdo is a dynamic interface for ecto.
 
-Dynamic interface to ecto functionallity. Ecdo was build for accessing it from erlang(elixir need to be in path)
-or simplify building dynamic interface, like API.
+Ecdo was build for accessing it from erlang(elixir need to be in path)
+or simplify building dynamic interface, for example API.
 
 Example of using from erlang:
 
