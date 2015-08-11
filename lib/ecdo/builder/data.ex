@@ -42,4 +42,9 @@ defmodule Ecdo.Builder.Data do
   end
 
   def get(map, key), do: Map.get(map, key) || []
+
+  def tokens(string) when is_binary(string) do
+    string |> String.split(",") |> Enum.map(&String.strip/1)
+  end
+  def tokens(list) when is_list(list), do: list
 end

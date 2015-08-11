@@ -7,7 +7,7 @@ defmodule Ecdo.Builder.OrderBy do
   import Ecto.Query
 
   def apply(ecdo, %{order_by: order_by}) do
-    String.split(order_by, ",") |> Enum.reduce(ecdo, &build(&2, &1))
+    order_by |> tokens |> Enum.reduce(ecdo, &build(&2, &1))
   end
   def apply(ecdo, _query), do: ecdo
 
