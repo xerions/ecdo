@@ -10,18 +10,19 @@ defmodule Ecdo.Builder.Load do
     put_in_query(ecdo, build(root, ecdo.query, content))
   end
 
-  defp build(model, query, %{preload: list}) when is_list(list) do
-    Enum.reduce(list, query, fn(el, q) -> build(model, q, %{preload: el}) end)
+  defp build(model, query, %{preload: list}) when is_list(list) or is_binary(list) do
+    list |> tokens |> Enum.reduce(query, fn(el, q) -> build1(model, q, %{preload: el}) end)
   end
-  defp build(model, query, %{preload: table}) do
+  defp build(model, query, %{load: list}), do: build(model, query, %{preload: list})
+  defp build(_, query, _), do: query
+
+  defp build1(model, query, %{preload: table}) do
     table = to_atom(table)
     if table in model.__schema__(:associations) do
       from(x in query, preload: ^table)
     else query
     end
   end
-  defp build(model, query, %{load: list}), do: build(model, query, %{preload: list})
-  defp build(_, query, _), do: query
 
   defp to_atom(table) when is_atom(table), do: table
   defp to_atom(table) when is_binary(table), do: String.to_atom(table)

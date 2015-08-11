@@ -19,6 +19,7 @@ defmodule Ecdo.Builder.Join do
     root = ecdo.modules[0]
     associations = root.__schema__(:associations) |> Enum.map(&Atom.to_string(&1))
     Map.get(params, direction) 
+    |> tokens
     |> Stream.filter(&(&1 in associations))
     |> Enum.map(&String.to_atom/1)
     |> Enum.reduce(ecdo, fn(table, ecdo) ->

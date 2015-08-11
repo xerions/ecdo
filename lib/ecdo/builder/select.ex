@@ -13,7 +13,8 @@ defmodule Ecdo.Builder.Select do
   defp build_select(content, ecdo) do
     select = Map.get(content, :select) || "" 
     select_as = content[:select_as] || :map
-    ast = String.split(select, ",") 
+    ast = select 
+          |> tokens
           |> add_funs(content) 
           |> Enum.map(&transform(&1, ecdo, select_as))
     case ast do

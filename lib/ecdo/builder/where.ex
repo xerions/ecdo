@@ -36,25 +36,25 @@ defmodule Ecdo.Builder.Where do
     [%QueryExpr{expr: expr, params: Enum.reverse(values)}]
   end
 
-  defp to_ecto_ast({op, _, _} = opast, acc, ecdo) when op in @allowed_operations, do: {opast, acc}
+  defp to_ecto_ast({op, _, _} = opast, acc, _ecdo) when op in @allowed_operations, do: {opast, acc}
   defp to_ecto_ast({{:., _, _} = field, _, _}, params, ecdo) do
     # We ignore the outer AST, because field_ast add wrapper back
     {field, _type, _index} = field_spec = field_ecto(field, ecdo)
     # Next element in form of {atom, _, nil} is a first part of atom.value call, and should be ignored
     {field_ast(field_spec), params(params, last: field, dot: true)}
   end
-  defp to_ecto_ast({_, _, nil} = other, params(dot: true) = params, ecdo), do: {other, params(params, dot: false)}
+  defp to_ecto_ast({_, _, nil} = other, params(dot: true) = params, _ecdo), do: {other, params(params, dot: false)}
   # If it is not a part of atom.value (dot: false), than it should be transformed to field
-  defp to_ecto_ast({field_name, _, nil} = other, params(dot: false) = params, ecdo) do
+  defp to_ecto_ast({field_name, _, nil}, params(dot: false) = params, ecdo) do
     {field, _type, _index} = field_spec = field_name |> to_string() |> field_ecto(ecdo)
     {field_ast(field_spec), params(params, last: field)}
   end
-  defp to_ecto_ast(string, params(last: field, count: count, values: values) = params, ecdo) when is_binary(string) do
+  defp to_ecto_ast(string, params(last: field, count: count, values: values) = params, _ecdo) when is_binary(string) do
     # as string i our parameter, we should replace it with name of the field and count
-    new_params = params(last: nil, count: count + 1, values: [{string, {count, field}} | values])
+    new_params = params(params, last: nil, count: count + 1, values: [{string, {count, field}} | values])
     {param_ast(count), new_params}
   end
-  defp to_ecto_ast(other, acc, ecdo) do
+  defp to_ecto_ast(other, acc, _ecdo) do
     {other, acc}
   end
 end
