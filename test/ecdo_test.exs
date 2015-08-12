@@ -32,11 +32,17 @@ defmodule EcdoTest do
   test "basic query check" do
     assert from(w in Weather) == query({"w", Weather}, %{}).query
     # basic list interface
+    assert inspect(from(w in Weather, where: like(w.name, "aa"))) == inspect(query({"w", Weather}, %{where: [{:like, "w.name", "aa"}]}).query)
+
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query({"w", Weather}, %{where: [{:==, "w.temp_lo", 20}]}).query)
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query(Weather, %{where: [{:==, "temp_lo", 20}]}).query)
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query(Weather, %{where: [{:==, "weather.temp_lo", 20}]}).query)
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query({"w", Weather}, %{"where" => "w.temp_lo == 20"}).query)
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query({"w", Weather}, %{"where" => "w.temp_lo == 20", unknow_key: 1}).query)
     assert inspect(from(w in Weather, where: w.temp_lo == 20)) == inspect(query({"w", Weather}, %{"where" => "w.temp_lo == 20", "unknow_key" => 1}).query)
+
+    assert inspect(from(w in Weather, where: like(w.name,"abc") or like(w.name, "fff") or like(w.name, "ccc"))) 
+           == inspect(query({"w", Weather}, %{"where" => [{:or, {:or, {:like, "w.name", "abc"}, {:like, "w.name", "fff"}},
+                                                           {:like, "w.name", "ccc"}}]}).query)
   end
 end
