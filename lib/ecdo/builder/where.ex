@@ -22,16 +22,21 @@ defmodule Ecdo.Builder.Where do
   @like_functions [:like, :ilike]
   @type_operators [:==, :>, :<, :!=, :>=, :<=]
   @allowed_operations [:not, :or, :and | @type_operators]
+  @allowed_operations_with_funs @like_functions ++ @allowed_operations
 
-  defp build_conditions({op, _, _} = opspec, ecdo) when op in @allowed_operations do
+  defp build_conditions({op, _, _} = opspec, ecdo) when op in @allowed_operations_with_funs do
     %QueryExpr{expr: op_ast(opspec, ecdo)}
   end
 
   defp op_ast({op, left, right}, ecdo) do
     # Build from condition list an AST
-    field_ast = field_ecto(left, ecdo) |> field_ast()
-    quote do: unquote(op)(unquote_splicing([field_ast, right]))
+    field_ast = case is_binary(left) do
+      true -> field_ecto(left, ecdo) |> field_ast()
+      false -> op_ast(left, ecdo)
+    end
+    quote do: unquote(op)(unquote_splicing([field_ast, op_ast(right, ecdo)]))
   end
+  defp op_ast(other, _ecdo), do: other
 
   defp build_ast([ast], ecdo) do
     {expr, params(values: values)} = Macro.prewalk(ast, params(), &to_ecto_ast(&1, &2, ecdo))
