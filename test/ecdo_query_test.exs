@@ -113,22 +113,30 @@ defmodule Ecdo.Integration.QueryTest do
   end
 
   test "load" do
-    p = TestRepo.insert!(%Post{title: "test_load"})
+    p = TestRepo.insert!(%Post{title: "test_load1"})
     TestRepo.insert!(%Permalink{url: "test_load_url", post_id: p.id})
-    TestRepo.insert!(%Comment{text: "test_load_commnet", post_id: p.id})
+    TestRepo.insert!(%Comment{text: "test_load_comment1", post_id: p.id})
+    p = TestRepo.insert!(%Post{title: "test_load2"})
+    TestRepo.insert!(%Comment{text: "test_load_comment2", post_id: p.id})
 
-    query = query({"p", Post}, %{where: "title == \"test_load\"", load: ["permalink"]})
+    query = query({"p", Post}, %{where: "title == \"test_load1\"", load: ["permalink"]})
     post = TestRepo.one(query)
-    assert post.title == "test_load"
+    assert post.title == "test_load1"
     assert post.permalink.url == "test_load_url"
 
-    query = query({"p", Post}, %{where: "title == \"test_load\"", load: ["permalink", :comments]})
+    query = query({"p", Post}, %{where: "title == \"test_load1\"", load: ["permalink", :comments]})
     post = TestRepo.one(query)
-    assert post.title == "test_load"
+    assert post.title == "test_load1"
     assert post.permalink.url == "test_load_url"
-    assert hd(post.comments).text == "test_load_commnet"
-    query = query({"p", Post}, %{where: "title == \"test_load\"", load: "permalink, comments"})
+    assert hd(post.comments).text == "test_load_comment1"
+    query = query({"p", Post}, %{where: "title == \"test_load1\"", load: "permalink, comments"})
     assert post == TestRepo.one(query)
+
+    query = query({"p", Post}, %{load: [{"comments", %{where: "text == \"test_load_comment1\""}}]})
+    [post1, post2] = TestRepo.all(query)
+    [comments1] = post1.comments
+    assert comments1.text == "test_load_comment1"
+    assert post2.comments == []
   end
 
   test "like" do

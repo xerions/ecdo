@@ -17,11 +17,22 @@ defmodule Ecdo.Builder.Load do
   defp build(model, query, %{load: list}), do: build(model, query, %{preload: list})
   defp build(_, query, _), do: query
 
+  defp build1(model, query, %{preload: {table, preload_query}}) do
+    table = to_atom(table)
+    if table in model.__schema__(:associations) do
+      preload_query = Ecdo.query({to_string(table), model.__schema__(:association, table).queryable}, preload_query)
+      from(x in query, preload: [{^table, ^preload_query.query}])
+    else
+      query
+    end
+  end
+
   defp build1(model, query, %{preload: table}) do
     table = to_atom(table)
     if table in model.__schema__(:associations) do
       from(x in query, preload: ^table)
-    else query
+    else
+      query
     end
   end
 
