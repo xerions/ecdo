@@ -11,8 +11,8 @@ defmodule Ecdo.Builder.Load do
     put_in_query(ecdo, build(root, ecdo.query, content))
   end
 
-  defp build(model, query, %{preload: list}) when is_list(list) or is_binary(list) do
-    list |> tokens |> Enum.reduce(query, fn(el, q) -> build1(model, q, %{preload: el}) end)
+  defp build(model, query, %{preload: preload}) when is_list(preload) or is_binary(preload) or is_map(preload) do
+    preload |> tokens |> Enum.reduce(query, fn(el, q) -> build1(model, q, %{preload: el}) end)
   end
   defp build(model, query, %{load: list}), do: build(model, query, %{preload: list})
   defp build(_, query, _), do: query

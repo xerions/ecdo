@@ -6,7 +6,6 @@ defmodule Ecdo do
   Ecto.Repo). Although this module provides a complete API, supporting
   expressions like `where`, `select` and so forth.
   """
-  @derive [Access]
   defstruct [sources: %{}, modules: %{}, count: 0, param: nil, query: %Ecto.Query{}]
 
   @doc """

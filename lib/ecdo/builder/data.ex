@@ -94,4 +94,5 @@ defmodule Ecdo.Builder.Data do
     string |> String.split(",") |> Enum.map(&String.strip/1)
   end
   def tokens(list) when is_list(list), do: list
+  def tokens(map) when is_map(map), do: map
 end
