@@ -154,8 +154,8 @@ defmodule Ecdo.Integration.QueryTest do
   end
 
   test "like" do
-    TestRepo.insert!(%Post{title: "abcd"})
-    TestRepo.insert!(%Post{title: "adee"})
+    TestRepo.insert!(%Post{title: "abcd", visits: 10})
+    TestRepo.insert!(%Post{title: "adee", visits: 100})
 
     query = query({"p", Post}, %{select: "title", where: "like(title, \"%bc%\")", select_as: :one} )
     assert "abcd" == TestRepo.one(query)
@@ -166,5 +166,10 @@ defmodule Ecdo.Integration.QueryTest do
     query = query({"p", Post}, %{select: "title", where: [{:or, {:or, {:like, "title", "%bc%"}, {:like, "title", "%de%"}},
                                                                 {:like, "title", "%d%"}}], select_as: :list} )
     assert [["abcd"], ["adee"]] == TestRepo.all(query)
+
+    query = query({"p", Post}, %{select: "title", where: ["visits > 50", 
+                                                          {:or, {:or, {:like, "title", "%bc%"}, {:like, "title", "%de%"}},
+                                                                {:like, "title", "%d%"}}], select_as: :list} )
+    assert [["adee"]] == TestRepo.all(query)
   end
 end

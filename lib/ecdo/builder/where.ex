@@ -27,6 +27,8 @@ defmodule Ecdo.Builder.Where do
   defp build_conditions({op, _, _} = opspec, ecdo) when op in @allowed_operations_with_funs do
     %QueryExpr{expr: op_ast(opspec, ecdo)}
   end
+  defp build_conditions(where, ecdo) when is_binary(where), 
+    do: List.first build(where, ecdo)
 
   defp op_ast({op, left, right}, ecdo) do
     # Build from condition list an AST
