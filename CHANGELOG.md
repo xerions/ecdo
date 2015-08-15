@@ -1,3 +1,9 @@
+# 0.1.2
+
+* Enhancements
+  * add possibiity to mix parsed and unparsed form in where in query
+  * update to ecto ~> 0.16.0
+
 # 0.1.1
 
 * Enhancements
