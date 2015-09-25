@@ -1,3 +1,8 @@
+# 0.1.3
+
+* Enhancements
+  * update to ecto ~> 1.0.0
+
 # 0.1.2
 
 * Enhancements

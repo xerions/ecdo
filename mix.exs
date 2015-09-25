@@ -3,7 +3,7 @@ defmodule Ecdo.Mixfile do
 
   def project do
     [app: :ecdo,
-     version: "0.1.2",
+     version: "0.1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: Coverex.Task, coveralls: true],
@@ -19,7 +19,7 @@ defmodule Ecdo.Mixfile do
   defp deps do
     [{:mariaex, ">= 0.0.0", optional: true},
      {:postgrex, ">= 0.0.0", optional: true},
-     {:ecto, "~> 0.16.0"},
+     {:ecto, "~> 1.0.0"},
      {:coverex, "~> 1.4.1", only: :test}]
   end
 
