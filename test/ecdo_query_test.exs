@@ -60,6 +60,10 @@ defmodule Ecdo.Integration.QueryTest do
                                  where: "p.text == comments.text and comments.lock_version == 2",
                                  join: ["comments"], select_as: :one})
     assert [p1.text, 2] == TestRepo.one(query)
+
+    query = query(Post, %{"where" => "text == \"test1\" or text == \"test2\""})
+    result = TestRepo.all(query)
+    assert [] = result
   end
 
   test "funs" do

@@ -62,9 +62,10 @@ defmodule Ecdo.Builder.Where do
     # We do not need to set type, if operator is like, we set operator to :function, if we see like
     {field_ast(field_spec, operator == :default), params(params, last: field)}
   end
-  defp to_ecto_ast(string, params(operator: :default, last: field, count: count, values: values) = params, _ecdo) when is_binary(string) do
+  defp to_ecto_ast(string, params(operator: :default, last: field, values: values) = params, ecdo) when is_binary(string) do
+    {_, _, count} = field_ecto([string], ecdo)
     # as string i our parameter, we should replace it with name of the field and count
-    new_params = params(params, last: nil, count: count + 1, values: [{string, {count, field}} | values])
+    new_params = params(params, last: nil, count: count, values: [{string, {count, field}} | values])
     {param_ast(count), new_params}
   end
   defp to_ecto_ast(other, acc, _ecdo) do
