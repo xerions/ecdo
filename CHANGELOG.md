@@ -1,3 +1,8 @@
+# 0.1.4
+
+* Bug fixes
+  * fix possiblity to use more than one field in where with or/and
+
 # 0.1.3
 
 * Enhancements
