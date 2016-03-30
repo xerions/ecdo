@@ -40,12 +40,9 @@ defmodule Ecdo.Builder.Select do
   end
 
   defp funs(params) do
-    Map.keys(params) |> Enum.map(fn(k) ->
-      case k in @aggr_funs do
-        true -> {k, Map.fetch!(params, k)}
-        false -> []
-      end
-    end) |> :lists.flatten
+    for {p, vals} <- params, p in @aggr_funs do
+      {p, vals}
+    end
   end
 
   defp add_funs([""], content), do: funs(content)
